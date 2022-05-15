@@ -2,9 +2,9 @@
 # Devem alterar as classes e funções neste ficheiro de acordo com as instruções do enunciado.
 # Além das funções e classes já definidas, podem acrescentar outras que considerem pertinentes.
 
-# Grupo 00:
-# 00000 Nome1
-# 00000 Nome2
+# Grupo 15:
+# 99102 Manuel Albino
+# 99108 Matilde Tocha
 
 import sys
 from search import (
@@ -35,14 +35,19 @@ class TakuzuState:
 class Board:
     """Representação interna de um tabuleiro de Takuzu."""
 
+    def __init__(self, board: list) -> None:     # [[1, 0, ], [0, 0, ], [ , 1, ]]
+        self.board = board
+        
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
+        
         # TODO
         pass
 
     def adjacent_vertical_numbers(self, row: int, col: int) -> (int, int):
         """Devolve os valores imediatamente abaixo e acima,
         respectivamente."""
+        
         # TODO
         pass
 
