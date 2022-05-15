@@ -64,12 +64,12 @@ class Board:
 
         Por exemplo:
             $ python3 takuzu.py < input_T01
-
-            > from sys import stdin
-            > stdin.readline()
         """
-        # TODO
-        pass
+        n = sys.stdin.readline()
+        for line in sys.stdin:
+            self.board = [line.split]
+        
+        
 
     # TODO: outros metodos da classe
 
