@@ -35,28 +35,37 @@ class TakuzuState:
 class Board:
     """Representação interna de um tabuleiro de Takuzu."""
 
-    def __init__(self) -> None:     # [[1, 0, ], [0, 0, ], [ , 1, ]]
-        self.board = []
+    def __init__(self, board:list, n:int) -> None:
+        self.board = board
+        self.n = n
         
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
-        
-        # TODO
-        pass
-
-    def adjacent_vertical_numbers(self, row: int, col: int) -> (int, int):
+        return self.board[row][col]
+      
+      
+    def adjacent_vertical_numbers(self, row: int, col: int) -> tuple:
         """Devolve os valores imediatamente abaixo e acima,
         respectivamente."""
-        
-        # TODO
-        pass
+        return (self.board[row+1][col], self.board[row-1][col]) if row - 1 >= 0 and row + 1 < self.n \
+            else ((self.board[row+1][col], None) if row - 1 < 0 else (None, self.board[row-1][col]))
 
-    def adjacent_horizontal_numbers(self, row: int, col: int) -> (int, int):
+    def adjacent_horizontal_numbers(self, row: int, col: int) -> tuple:
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
-        # TODO
-        pass
-
+        return (self.board[row][col-1], self.board[row][col+1]) if col - 1 >= 0 and col + 1 < self.n \
+            else ((None, self.board[row][col+1]) if col - 1 < 0 else (self.board[row][col-1], None)) 
+    
+    def __str__(self) -> str:
+        string = ''
+        for i in range(self.n):
+            for j in range(self.n):
+                string += str(self.board[i][j]) + '\t'
+            if i != self.n:
+                string += '\n'
+        return string 
+               
+        
     @staticmethod
     def parse_instance_from_stdin():
         """Lê o test do standard input (stdin) que é passado como argumento
@@ -65,13 +74,13 @@ class Board:
         Por exemplo:
             $ python3 takuzu.py < input_T01
         """
-        n = sys.stdin.readline()
-        for line in sys.stdin:
-            self.board = [line.split]
+        n = int(sys.stdin.readline())
+        return Board([list(map(int, sys.stdin.readline().split("\t"))) for i in range(n)], n)
         
         
-
     # TODO: outros metodos da classe
+
+
 
 
 class Takuzu(Problem):
