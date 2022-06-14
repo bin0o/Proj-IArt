@@ -64,8 +64,12 @@ class Board:
             if i != self.n:
                 string += '\n'
         return string 
-               
-        
+    
+    def put_piece(self, pos:tuple) -> list: 
+        cp_board = self.board.copy()
+        cp_board[pos[0]][pos[1]] = pos[2] 
+        return cp_board
+
     @staticmethod
     def parse_instance_from_stdin():
         """Lê o test do standard input (stdin) que é passado como argumento
@@ -80,13 +84,20 @@ class Board:
         
     # TODO: outros metodos da classe
 
+# board=Board.parse_instance_from_stdin()
+# print("Initial:\n",board,sep="")
 
+# print(board.adjacent_vertical_numbers(3, 3))
+# print(board.adjacent_horizontal_numbers(3, 3))
+
+# print(board.adjacent_vertical_numbers(1, 1))
+# print(board.adjacent_horizontal_numbers(1, 1))
 
 
 class Takuzu(Problem):
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
-        # TODO
+        self.board = board
         pass
 
     def actions(self, state: TakuzuState):
