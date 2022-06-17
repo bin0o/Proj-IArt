@@ -51,7 +51,7 @@ class Board:
             tupl=()
             for j in range(self.n):
                 tupl+=(self.board[j][i],)
-            tup+(tupl,)
+            tup+=(tupl,)
         return tup
     
     def get_lines(self):
@@ -104,10 +104,10 @@ class Board:
         
     # TODO: outros metodos da classe
 
-# board = Board.parse_instance_from_stdin()
-# print("Initial:\n",board,sep="")
-# print(board.get_columns())
-# print(board.get_lines())
+board = Board.parse_instance_from_stdin()
+print("Initial:\n",board,sep="")
+print(board.get_columns())
+print(board.get_lines())
 
 
 # print(board.adjacent_vertical_numbers(3, 3))
@@ -158,10 +158,10 @@ class Takuzu(Problem):
 
     # TODO: outros metodos da classe
 
-board = Board.parse_instance_from_stdin()
-problem = Takuzu(board)
-print("Initial:\n",board,sep="")
-print(problem.equal_vertical_adjacents((0, 0)))
+# board = Board.parse_instance_from_stdin()
+# problem = Takuzu(board)
+# print("Initial:\n",board,sep="")
+# print(problem.equal_vertical_adjacents((0, 0)))
 
 if __name__ == "__main__":
     # TODO:
