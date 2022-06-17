@@ -35,14 +35,13 @@ class TakuzuState:
 class Board:
     """Representação interna de um tabuleiro de Takuzu."""
 
-    def __init__(self, board:list, n:int) -> None:
+    def __init__(self, board: list, n: int) -> None:
         self.board = board
         self.n = n
         
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
         return self.board[row][col]
-      
       
     def adjacent_vertical_numbers(self, row: int, col: int) -> tuple:
         """Devolve os valores imediatamente abaixo e acima,
@@ -65,10 +64,13 @@ class Board:
                 string += '\n'
         return string 
     
-    def put_piece(self, pos:tuple) -> list: 
+    def put_piece(self, pos: tuple) -> list: 
         cp_board = self.board.copy()
         cp_board[pos[0]][pos[1]] = pos[2] 
         return cp_board
+    
+    def get_avail_pos(self):
+        return tuple((row, col) for row in range(self.n) for col in range(self.n) if self.get_number(row, col) == 2)
 
     @staticmethod
     def parse_instance_from_stdin():
@@ -86,6 +88,7 @@ class Board:
 
 # board=Board.parse_instance_from_stdin()
 # print("Initial:\n",board,sep="")
+# print(board.get_avail_pos())
 
 # print(board.adjacent_vertical_numbers(3, 3))
 # print(board.adjacent_horizontal_numbers(3, 3))
@@ -93,18 +96,17 @@ class Board:
 # print(board.adjacent_vertical_numbers(1, 1))
 # print(board.adjacent_horizontal_numbers(1, 1))
 
-
 class Takuzu(Problem):
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
         self.board = board
-        pass
+        self.state = TakuzuState(board)
 
     def actions(self, state: TakuzuState):
         """Retorna uma lista de ações que podem ser executadas a
         partir do estado passado como argumento."""
-        # TODO
-        pass
+        
+        
 
     def result(self, state: TakuzuState, action):
         """Retorna o estado resultante de executar a 'action' sobre
@@ -112,6 +114,8 @@ class Takuzu(Problem):
         das presentes na lista obtida pela execução de
         self.actions(state)."""
         # TODO
+        
+        
         pass
 
     def goal_test(self, state: TakuzuState):
