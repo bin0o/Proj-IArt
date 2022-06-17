@@ -104,10 +104,10 @@ class Board:
         
     # TODO: outros metodos da classe
 
-board = Board.parse_instance_from_stdin()
-print("Initial:\n",board,sep="")
-print(board.get_columns())
-print(board.get_lines())
+# board = Board.parse_instance_from_stdin()
+# print("Initial:\n",board,sep="")
+# print(board.get_columns())
+# print(board.get_lines())
 
 
 # print(board.adjacent_vertical_numbers(3, 3))
@@ -128,20 +128,19 @@ class Takuzu(Problem):
         posicoes_livres = self.board.get_avail_pos()
         
     def equal_vertical_adjacents(self, pos): # rule 1
-        for value in (0, 1):
-            if value in self.board.adjacent_vertical_numbers(pos[0], pos[1]):
-                continue
-            else:
-                return (value) + pos
+        return tuple(value for value in (0,1) if value not in self.board.adjacent_vertical_numbers(pos[0], pos[1])) \
+            + pos
+    
+    def equal_horizontal_adjacents(self, pos): # rule 2
+        return tuple(value for value in (0,1) if value not in self.board.adjacent_horizontal_numbers(pos[0], pos[1])) \
+        + pos
 
     def result(self, state: TakuzuState, action):
         """Retorna o estado resultante de executar a 'action' sobre
         'state' passado como argumento. A ação a executar deve ser uma
         das presentes na lista obtida pela execução de
         self.actions(state)."""
-        
-        
-        
+        # TODO
         pass
 
     def goal_test(self, state: TakuzuState):
@@ -158,10 +157,10 @@ class Takuzu(Problem):
 
     # TODO: outros metodos da classe
 
-# board = Board.parse_instance_from_stdin()
-# problem = Takuzu(board)
-# print("Initial:\n",board,sep="")
-# print(problem.equal_vertical_adjacents((0, 0)))
+board = Board.parse_instance_from_stdin()
+problem = Takuzu(board)
+print("Initial:\n",board,sep="")
+print(problem.equal_vertical_adjacents((0, 1)))
 
 if __name__ == "__main__":
     # TODO:
