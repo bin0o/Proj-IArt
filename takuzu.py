@@ -7,6 +7,8 @@
 # 99108 Matilde Tocha
 
 import sys
+
+from numpy import broadcast_to
 from search import (
     Problem,
     Node,
@@ -42,7 +44,23 @@ class Board:
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
         return self.board[row][col]
-      
+            
+    def get_columns(self):
+        tup=()
+        for i in range(self.n):
+            tupl=()
+            for j in range(self.n):
+                tupl+=(self.board[j][i],)
+            tup+(tupl,)
+        return tup
+    
+    def get_lines(self):
+        tup=()
+        for i in range(self.n):
+           tup+=(tuple(self.board[i]),)
+        return tup
+
+        
     def adjacent_vertical_numbers(self, row: int, col: int) -> tuple:
         """Devolve os valores imediatamente abaixo e acima,
         respectivamente."""
@@ -69,7 +87,7 @@ class Board:
         cp_board[pos[0]][pos[1]] = pos[2] 
         return cp_board
     
-    def get_avail_pos(self):
+    def get_avail_pos(self) -> tuple:
         return tuple((row, col) for row in range(self.n) for col in range(self.n) if self.get_number(row, col) == 2)
 
     @staticmethod
@@ -86,9 +104,11 @@ class Board:
         
     # TODO: outros metodos da classe
 
-# board=Board.parse_instance_from_stdin()
+# board = Board.parse_instance_from_stdin()
 # print("Initial:\n",board,sep="")
-# print(board.get_avail_pos())
+# print(board.get_columns())
+# print(board.get_lines())
+
 
 # print(board.adjacent_vertical_numbers(3, 3))
 # print(board.adjacent_horizontal_numbers(3, 3))
@@ -105,15 +125,21 @@ class Takuzu(Problem):
     def actions(self, state: TakuzuState):
         """Retorna uma lista de ações que podem ser executadas a
         partir do estado passado como argumento."""
+        posicoes_livres = self.board.get_avail_pos()
         
-        
+    def equal_vertical_adjacents(self, pos): # rule 1
+        for value in (0, 1):
+            if value in self.board.adjacent_vertical_numbers(pos[0], pos[1]):
+                continue
+            else:
+                return (value) + pos
 
     def result(self, state: TakuzuState, action):
         """Retorna o estado resultante de executar a 'action' sobre
         'state' passado como argumento. A ação a executar deve ser uma
         das presentes na lista obtida pela execução de
         self.actions(state)."""
-        # TODO
+        
         
         
         pass
@@ -132,6 +158,10 @@ class Takuzu(Problem):
 
     # TODO: outros metodos da classe
 
+board = Board.parse_instance_from_stdin()
+problem = Takuzu(board)
+print("Initial:\n",board,sep="")
+print(problem.equal_vertical_adjacents((0, 0)))
 
 if __name__ == "__main__":
     # TODO:
