@@ -138,12 +138,12 @@ class Takuzu(Problem):
         return tuple(value for value in (0,1) if value not in self.board.adjacent_horizontal_numbers(pos[0], pos[1])) \
         + pos
     
-    def different_columns_lines(self):
-        lines_columns = self.board.get_lines() + self.board.get_columns()
+    def different_columns_lines(self, board : Board):
+        lines_columns = board.get_lines() + board.get_columns()
         return len(set(lines_columns)) == len(lines_columns)
     
-    def equal_number_1_0(self):
-        lines_columns = self.board.get_lines() + self.board.get_columns()
+    def equal_number_1_0(self, board: Board):
+        lines_columns = board.get_lines() + board.get_columns()
         var = lines_columns[0][0]
         for i in range(len(lines_columns)):
             count_var=0
@@ -168,8 +168,9 @@ class Takuzu(Problem):
         """Retorna True se e só se o estado passado como argumento é
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
         estão preenchidas com uma sequência de números adjacentes."""
-        # TODO
-        pass
+        board=state.board
+        
+        return self.different_columns_lines(board) and self.equal_number_1_0(board)
 
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
@@ -181,7 +182,7 @@ class Takuzu(Problem):
 board = Board.parse_instance_from_stdin()
 problem = Takuzu(board)
 print("Initial:\n",board,sep="")
-print(problem.equal_number_1_0())
+print(problem.goal_test(problem))
 # print(problem.equal_vertical_adjacents((0, 1)))
 
 if __name__ == "__main__":
