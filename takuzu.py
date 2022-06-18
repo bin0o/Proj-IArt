@@ -6,9 +6,11 @@
 # 99102 Manuel Albino
 # 99108 Matilde Tocha
 
+from itertools import count
 import sys
 
 from numpy import broadcast_to
+from sqlalchemy import false, true
 from search import (
     Problem,
     Node,
@@ -116,6 +118,7 @@ class Board:
 # print(board.adjacent_vertical_numbers(1, 1))
 # print(board.adjacent_horizontal_numbers(1, 1))
 
+
 class Takuzu(Problem):
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
@@ -134,7 +137,25 @@ class Takuzu(Problem):
     def equal_horizontal_adjacents(self, pos): # rule 2
         return tuple(value for value in (0,1) if value not in self.board.adjacent_horizontal_numbers(pos[0], pos[1])) \
         + pos
-
+    
+    def different_columns_lines(self):
+        lines_columns = self.board.get_lines() + self.board.get_columns()
+        return len(set(lines_columns)) == len(lines_columns)
+    
+    def equal_number_1_0(self):
+        lines_columns = self.board.get_lines() + self.board.get_columns()
+        var = lines_columns[0][0]
+        for i in range(len(lines_columns)):
+            count_var=0
+            for k in range(len(lines_columns[0])):
+                if count_var > (len(lines_columns[0]))/2:
+                    return false
+                if lines_columns[i][k] == var:
+                    count_var+=1
+            if count_var != (len(lines_columns[0]))/2:
+                return false
+        return true
+    
     def result(self, state: TakuzuState, action):
         """Retorna o estado resultante de executar a 'action' sobre
         'state' passado como argumento. A ação a executar deve ser uma
@@ -160,7 +181,8 @@ class Takuzu(Problem):
 board = Board.parse_instance_from_stdin()
 problem = Takuzu(board)
 print("Initial:\n",board,sep="")
-print(problem.equal_vertical_adjacents((0, 1)))
+print(problem.equal_number_1_0())
+# print(problem.equal_vertical_adjacents((0, 1)))
 
 if __name__ == "__main__":
     # TODO:
