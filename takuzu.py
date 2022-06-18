@@ -138,23 +138,6 @@ class Takuzu(Problem):
         return tuple(value for value in (0,1) if value not in self.board.adjacent_horizontal_numbers(pos[0], pos[1])) \
         + pos
     
-    def different_columns_lines(self, board : Board):
-        lines_columns = board.get_lines() + board.get_columns()
-        return len(set(lines_columns)) == len(lines_columns)
-    
-    def equal_number_1_0(self, board: Board):
-        lines_columns = board.get_lines() + board.get_columns()
-        var = lines_columns[0][0]
-        for i in range(len(lines_columns)):
-            count_var=0
-            for k in range(len(lines_columns[0])):
-                if count_var > (len(lines_columns[0]))/2:
-                    return false
-                if lines_columns[i][k] == var:
-                    count_var+=1
-            if count_var != (len(lines_columns[0]))/2:
-                return false
-        return true
     
     def result(self, state: TakuzuState, action):
         """Retorna o estado resultante de executar a 'action' sobre
@@ -168,9 +151,17 @@ class Takuzu(Problem):
         """Retorna True se e só se o estado passado como argumento é
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
         estão preenchidas com uma sequência de números adjacentes."""
-        board=state.board
+        board = state.board
         
-        return self.different_columns_lines(board) and self.equal_number_1_0(board)
+        def different_columns_lines(self, board : Board):
+            return len(set(board.get_lines())) == len(board.get_lines()) and len(set(board.get_columns())) == len(board.get_columns()) 
+        
+        def equal_number_1_0(self, board : Board):
+            lc = sum(board.get_lines(), ())
+            
+            return lc.count(0) == lc.count(1) and lc.count(0) == (board.n ** 2) / 2
+        
+        return different_columns_lines(board) and equal_number_1_0(board)
 
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
@@ -181,8 +172,9 @@ class Takuzu(Problem):
 
 board = Board.parse_instance_from_stdin()
 problem = Takuzu(board)
+state = TakuzuState(board)
 print("Initial:\n",board,sep="")
-print(problem.goal_test(problem))
+print(problem.goal_test(state))
 # print(problem.equal_vertical_adjacents((0, 1)))
 
 if __name__ == "__main__":
