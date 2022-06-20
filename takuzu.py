@@ -7,11 +7,11 @@
 # 99108 Matilde Tocha
 
 from itertools import count
-import sys
 import numpy as np
+from numpy import array, broadcast_to
 
-from numpy import broadcast_to
-from sqlalchemy import false, true
+import sys
+
 from search import (
     Problem,
     Node,
@@ -21,7 +21,6 @@ from search import (
     greedy_search,
     recursive_best_first_search,
 )
-
 
 class TakuzuState:
     state_id = 0
@@ -46,52 +45,53 @@ class Board:
         
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
-        return self.board[row,col]
+        return self.board[row, col]
             
-    def get_columns(self):
-        tup=()
-        for i in range(self.n):
-            tupl=()
-            for j in range(self.n):
-                tupl+=(self.board[j,i],)
-            tup+=(tupl,)
-        return tup
+    def get_columns(self) -> array:
+        # tup = ()
+        # for i in range(self.n):
+        #     tupl = ()
+        #     for j in range(self.n):
+        #         tupl += (self.board[j, i],)
+        #     tup += (tupl,)
+        return np.array([self.board[:, i] for i in range(self.n)])
     
-    def get_lines(self):
-        tup=()
-        for i in range(self.n):
-           tup+=(tuple(self.board[i]),)
-        return tup
+    def get_rows(self) -> array:
+        # tup = ()
+        # for i in range(self.n):
+        #    tup += (tuple(self.board[i]),)
+        # np.array([self.board[i, :] for i in range(self.n)])
+        return self.board
+    
+    def get_avail_pos(self) -> tuple:
+        return tuple((row, col) for row in range(self.n) for col in range(self.n) \
+            if self.get_number(row, col) == 2)
 
+    def put_piece(self, pos: tuple) -> array: 
+        cp_board = self.board.copy()
+        cp_board[pos[0], pos[1]] = pos[2] 
+        return cp_board
         
     def adjacent_vertical_numbers(self, row: int, col: int) -> tuple:
         """Devolve os valores imediatamente abaixo e acima,
         respectivamente."""
-        return (self.board[row+1,col], self.board[row-1,col]) if row - 1 >= 0 and row + 1 < self.n \
-            else ((self.board[row+1,col], None) if row - 1 < 0 else (None, self.board[row-1,col]))
+        return (self.board[row+1, col], self.board[row-1, col]) if row - 1 >= 0 and row + 1 < self.n \
+            else ((self.board[row+1, col], None) if row - 1 < 0 else (None, self.board[row-1, col]))
 
     def adjacent_horizontal_numbers(self, row: int, col: int) -> tuple:
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
-        return (self.board[row,col-1], self.board[row,col+1]) if col - 1 >= 0 and col + 1 < self.n \
-            else ((None, self.board[row,col+1]) if col - 1 < 0 else (self.board[row,col-1], None)) 
+        return (self.board[row, col-1], self.board[row, col+1]) if col - 1 >= 0 and col + 1 < self.n \
+            else ((None, self.board[row, col+1]) if col - 1 < 0 else (self.board[row, col-1], None)) 
     
     def __str__(self) -> str:
         string = ''
         for i in range(self.n):
             for j in range(self.n):
-                string += str(self.board[i,j]) + '\t'
+                string += str(self.board[i, j]) + '\t'
             if i != self.n:
                 string += '\n'
         return string 
-    
-    def put_piece(self, pos: tuple) -> list: 
-        cp_board = self.board.copy()
-        cp_board[pos[0],pos[1]] = pos[2] 
-        return cp_board
-    
-    def get_avail_pos(self) -> tuple:
-        return tuple((row, col) for row in range(self.n) for col in range(self.n) if self.get_number(row, col) == 2)
 
     @staticmethod
     def parse_instance_from_stdin():
@@ -103,19 +103,16 @@ class Board:
         """
         n = int(sys.stdin.readline())
         
-        list_board=[list(map(int, sys.stdin.readline().split("\t"))) for i in range(n)]
-        list_board=np.array(list_board)
-        return Board(list_board,n)
-    
+        list_board = [list(map(int, sys.stdin.readline().split("\t"))) for i in range(n)]
+        list_board = np.array(list_board)
         
-        
-    # TODO: outros metodos da classe
+        return Board(list_board, n)
 
-board = Board.parse_instance_from_stdin()
-print("Initial:\n",board,sep="")
-print(board.get_columns())
-print(board.get_lines())
-print(board.get_avail_pos())
+# board = Board.parse_instance_from_stdin()
+# print("Initial:\n", board, sep = "")
+# print(board.get_columns())
+# print(board.get_rows())
+# print(board.get_avail_pos())
 
 
 # print(board.adjacent_vertical_numbers(3, 3))
@@ -131,18 +128,38 @@ class Takuzu(Problem):
         self.board = board
         self.state = TakuzuState(board)
 
-    def actions(self, state: TakuzuState):
+    def actions(self, state: TakuzuState) -> tuple:
         """Retorna uma lista de ações que podem ser executadas a
         partir do estado passado como argumento."""
-        posicoes_livres = self.board.get_avail_pos()
+        avail_pos = self.board.get_avail_pos()
+                    
+        def fill_cols(self) -> tuple: # rule 1
+            columns = self.board.get_columns()
+            
+            for i in range(len(columns)):
+                if np.count_nonzero(columns[i] == 0) == self.board.n / 2:
+                    return tuple((1, pos) for pos in self.board.get_avail_pos() if pos[1] == i)
+                
+                elif np.count_nonzero(columns[i] == 1) == self.board.n / 2:
+                    return tuple((0,) + pos for pos in self.board.get_avail_pos() if pos[1] == i)
         
-    def equal_vertical_adjacents(self, pos): # rule 1
-        return tuple(value for value in (0,1) if value not in self.board.adjacent_vertical_numbers(pos[0], pos[1])) \
-            + pos
-    
-    def equal_horizontal_adjacents(self, pos): # rule 2
-        return tuple(value for value in (0,1) if value not in self.board.adjacent_horizontal_numbers(pos[0], pos[1])) \
-        + pos
+        def fill_rows(self) -> tuple:
+            rows = self.board.get_rows()
+            
+            for i in range(len(rows)):
+                if np.count_nonzero(rows[i] == 0) == self.board.n / 2:
+                    return tuple((1, pos) for pos in self.board.get_avail_pos() if pos[0] == i)
+                
+                elif np.count_nonzero(rows[i] == 1) == self.board.n / 2:
+                    return tuple((0,) + pos for pos in self.board.get_avail_pos() if pos[0] == i)
+        
+        def equal_vertical_adjacents(self, pos): # rule 2
+            return tuple(value for value in (0,1) if value not in \
+                self.board.adjacent_vertical_numbers(pos[0], pos[1])) + pos
+        
+        def equal_horizontal_adjacents(self, pos): # rule 3
+            return tuple(value for value in (0,1) if value not in \
+                self.board.adjacent_horizontal_numbers(pos[0], pos[1])) + pos
     
     
     def result(self, state: TakuzuState, action):
@@ -160,7 +177,8 @@ class Takuzu(Problem):
         board = state.board
         
         def different_columns_lines(self, board : Board):
-            return len(set(board.get_lines())) == len(board.get_lines()) and len(set(board.get_columns())) == len(board.get_columns()) 
+            return len(set(board.get_lines())) == len(board.get_lines()) and \
+                len(set(board.get_columns())) == len(board.get_columns()) 
         
         def equal_number_1_0(self, board : Board):
             lc = sum(board.get_lines(), ())
@@ -176,13 +194,6 @@ class Takuzu(Problem):
 
     # TODO: outros metodos da classe
 
-# board = Board.parse_instance_from_stdin()
-# problem = Takuzu(board)
-# state = TakuzuState(board)
-# print("Initial:\n",board,sep="")
-# print(problem.goal_test(state))
-# print(problem.equal_vertical_adjacents((0, 1)))
-
 if __name__ == "__main__":
     # TODO:
     # Ler o ficheiro de input de sys.argv[1],
@@ -190,3 +201,13 @@ if __name__ == "__main__":
     # Retirar a solução a partir do nó resultante,
     # Imprimir para o standard output no formato indicado.
     pass
+
+
+board = Board.parse_instance_from_stdin()
+print("Initial:\n",board,sep="")
+problem = Takuzu(board)
+state = TakuzuState(board)
+print(problem.fill_cols_rows())
+# print(problem.last_avail_pos(avail_pos))
+# print(problem.goal_test(state))
+# print(problem.equal_vertical_adjacents((0, 1)))
