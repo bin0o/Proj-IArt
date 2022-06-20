@@ -92,6 +92,9 @@ class Board:
             if i != self.n:
                 string += '\n'
         return string 
+    
+    def copy(self):
+        return self.board.copy() 
 
     @staticmethod
     def parse_instance_from_stdin():
@@ -167,7 +170,10 @@ class Takuzu(Problem):
         'state' passado como argumento. A ação a executar deve ser uma
         das presentes na lista obtida pela execução de
         self.actions(state)."""
-        # TODO
+        cp_board = state.board.copy()
+        
+
+        
         pass
 
     def goal_test(self, state: TakuzuState):
