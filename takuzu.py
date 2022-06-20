@@ -8,6 +8,7 @@
 
 from itertools import count
 import sys
+import numpy as np
 
 from numpy import broadcast_to
 from sqlalchemy import false, true
@@ -39,20 +40,20 @@ class TakuzuState:
 class Board:
     """Representação interna de um tabuleiro de Takuzu."""
 
-    def __init__(self, board: list, n: int) -> None:
+    def __init__(self, board: np.array, n: int) -> None:
         self.board = board
         self.n = n
         
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
-        return self.board[row][col]
+        return self.board[row,col]
             
     def get_columns(self):
         tup=()
         for i in range(self.n):
             tupl=()
             for j in range(self.n):
-                tupl+=(self.board[j][i],)
+                tupl+=(self.board[j,i],)
             tup+=(tupl,)
         return tup
     
@@ -66,27 +67,27 @@ class Board:
     def adjacent_vertical_numbers(self, row: int, col: int) -> tuple:
         """Devolve os valores imediatamente abaixo e acima,
         respectivamente."""
-        return (self.board[row+1][col], self.board[row-1][col]) if row - 1 >= 0 and row + 1 < self.n \
-            else ((self.board[row+1][col], None) if row - 1 < 0 else (None, self.board[row-1][col]))
+        return (self.board[row+1,col], self.board[row-1,col]) if row - 1 >= 0 and row + 1 < self.n \
+            else ((self.board[row+1,col], None) if row - 1 < 0 else (None, self.board[row-1,col]))
 
     def adjacent_horizontal_numbers(self, row: int, col: int) -> tuple:
         """Devolve os valores imediatamente à esquerda e à direita,
         respectivamente."""
-        return (self.board[row][col-1], self.board[row][col+1]) if col - 1 >= 0 and col + 1 < self.n \
-            else ((None, self.board[row][col+1]) if col - 1 < 0 else (self.board[row][col-1], None)) 
+        return (self.board[row,col-1], self.board[row,col+1]) if col - 1 >= 0 and col + 1 < self.n \
+            else ((None, self.board[row,col+1]) if col - 1 < 0 else (self.board[row,col-1], None)) 
     
     def __str__(self) -> str:
         string = ''
         for i in range(self.n):
             for j in range(self.n):
-                string += str(self.board[i][j]) + '\t'
+                string += str(self.board[i,j]) + '\t'
             if i != self.n:
                 string += '\n'
         return string 
     
     def put_piece(self, pos: tuple) -> list: 
         cp_board = self.board.copy()
-        cp_board[pos[0]][pos[1]] = pos[2] 
+        cp_board[pos[0],pos[1]] = pos[2] 
         return cp_board
     
     def get_avail_pos(self) -> tuple:
@@ -101,15 +102,20 @@ class Board:
             $ python3 takuzu.py < input_T01
         """
         n = int(sys.stdin.readline())
-        return Board([list(map(int, sys.stdin.readline().split("\t"))) for i in range(n)], n)
+        
+        list_board=[list(map(int, sys.stdin.readline().split("\t"))) for i in range(n)]
+        list_board=np.array(list_board)
+        return Board(list_board,n)
+    
         
         
     # TODO: outros metodos da classe
 
-# board = Board.parse_instance_from_stdin()
-# print("Initial:\n",board,sep="")
-# print(board.get_columns())
-# print(board.get_lines())
+board = Board.parse_instance_from_stdin()
+print("Initial:\n",board,sep="")
+print(board.get_columns())
+print(board.get_lines())
+print(board.get_avail_pos())
 
 
 # print(board.adjacent_vertical_numbers(3, 3))
@@ -170,11 +176,11 @@ class Takuzu(Problem):
 
     # TODO: outros metodos da classe
 
-board = Board.parse_instance_from_stdin()
-problem = Takuzu(board)
-state = TakuzuState(board)
-print("Initial:\n",board,sep="")
-print(problem.goal_test(state))
+# board = Board.parse_instance_from_stdin()
+# problem = Takuzu(board)
+# state = TakuzuState(board)
+# print("Initial:\n",board,sep="")
+# print(problem.goal_test(state))
 # print(problem.equal_vertical_adjacents((0, 1)))
 
 if __name__ == "__main__":
