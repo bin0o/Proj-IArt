@@ -6,8 +6,6 @@
 # 99102 Manuel Albino
 # 99108 Matilde Tocha
 
-from itertools import count
-from xmlrpc.client import boolean
 import numpy as np
 from numpy import array, broadcast_to, column_stack
 
@@ -68,14 +66,13 @@ class Board:
         return tuple((row, col) for row in range(self.n) for col in range(self.n) \
             if self.get_number(row, col) == 2)
 
-    def put_piece(self, pos: tuple) -> array: 
-        cp_board = self.board.copy()
-        cp_board[pos[0], pos[1]] = pos[2]
-
-        return cp_board
+    def put_piece(self, pos: tuple): 
+        self.board[pos[0], pos[1]] = int(str(pos[2]))
+        
+        return self.board
     
-    def index_in_range(self, row, col) -> boolean:
-        return row >= 0 and row < self.n and col >= 0 and col < self.n
+    def out_of_bounds(self, row, col) -> bool:
+        return row < 0 or row >= self.n or col < 0 or col >= self.n
         
     def adjacent_vertical_numbers(self, row: int, col: int) -> tuple:
         """Devolve os valores imediatamente abaixo e acima,
@@ -112,69 +109,53 @@ class Board:
         list_board = np.array(list_board)
         
         return Board(list_board, n)
-
-# board = Board.parse_instance_from_stdin()
-# print("Initial:\n", board, sep = "")
-# print(board.get_columns())
-# print(board.get_rows())
-# print(board.get_avail_pos())
-
-
-# print(board.adjacent_vertical_numbers(3, 3))
-# print(board.adjacent_horizontal_numbers(3, 3))
-
-# print(board.adjacent_vertical_numbers(1, 1))
-# print(board.adjacent_horizontal_numbers(1, 1))
-# print(board.index_in_range(5, 0))
-
-
+    
 class Takuzu(Problem):
     def __init__(self, board: Board):
         """O construtor especifica o estado inicial."""
         self.board = board
-        self.state = TakuzuState(board)
+        self.initial = TakuzuState(board)
 
     def actions(self, state: TakuzuState) -> tuple:
         """Retorna uma lista de ações que podem ser executadas a
         partir do estado passado como argumento."""
-        avail_pos = self.board.get_avail_pos()
-        
-        pass
+        board = Board(state.board.board, self.board.n)
+        avail_pos = board.get_avail_pos()
                     
-        def fill_cols(self) -> np.array: # rule 1
-            columns = self.board.get_columns()
+        def fill_cols() -> np.array: # rule 1
+            columns = board.get_columns()
             res = []
             np.array(res)
             
             for i in range(len(columns)):
-                if np.count_nonzero(columns[i] == 0) == self.board.n // 2 + self.board.n % 2:
-                    res += [(pos[0], pos[1], 1) for pos in self.board.get_avail_pos() if pos[1] == i]
+                if np.count_nonzero(columns[i] == 0) == board.n // 2 + board.n % 2:
+                    res += [(pos[0], pos[1], 1) for pos in avail_pos if pos[1] == i]
                 
-                elif np.count_nonzero(columns[i] == 1) == self.board.n // 2 + self.board.n % 2:
-                    res += [(pos[0], pos[1], 0) for pos in self.board.get_avail_pos() if pos[1] == i]
+                elif np.count_nonzero(columns[i] == 1) == board.n // 2 + board.n % 2:
+                    res += [(pos[0], pos[1], 0) for pos in avail_pos if pos[1] == i]
                     
             return res
         
-        def fill_rows(self) -> np.array: # rule 1
-            rows = self.board.get_rows()
+        def fill_rows() -> np.array: # rule 1
+            rows = board.get_rows()
             res = []
             np.array(res)
             
             for i in range(len(rows)):
-                if np.count_nonzero(rows[i] == 0) == self.board.n // 2 + self.board.n % 2:
-                    res += [(pos[0], pos[1], 1) for pos in self.board.get_avail_pos() if pos[0] == i]
+                if np.count_nonzero(rows[i] == 0) == board.n // 2 + board.n % 2:
+                    res += [(pos[0], pos[1], 1) for pos in avail_pos if pos[0] == i]
                 
-                elif np.count_nonzero(rows[i] == 1) == self.board.n // 2 + self.board.n % 2:
-                    res += [(pos[0], pos[1], 1) for pos in self.board.get_avail_pos() if pos[0] == i]
+                elif np.count_nonzero(rows[i] == 1) == board.n // 2 + board.n % 2:
+                    res += [(pos[0], pos[1], 1) for pos in avail_pos if pos[0] == i]
                     
             return res
     
-        def trios(self, avail_pos: tuple): # rule 2
+        def trios(): # rule 2
             res = []
             np.array(res)
             for pos in avail_pos:
-                adjacents_v = self.board.adjacent_vertical_numbers(pos[0], pos[1])
-                adjacents_h = self.board.adjacent_horizontal_numbers(pos[0], pos[1])
+                adjacents_v = board.adjacent_vertical_numbers(pos[0], pos[1])
+                adjacents_h = board.adjacent_horizontal_numbers(pos[0], pos[1])
 
                 if len(set(adjacents_v)) == 1 and (adjacents_v[0] == 0 or adjacents_v[0] == 1):
                     res += [(pos[0], pos[1], 1) if adjacents_v[0] == adjacents_v[1] == 0 else (pos[0], pos[1], 0)]
@@ -184,23 +165,58 @@ class Takuzu(Problem):
                     
             return res
     
-    def pairs(self, avail_pos: tuple): # rule 3
-        res = []
-        for pos in avail_pos:
-            adjacents_h = self.board.adjacent_horizontal_numbers(pos[0], pos[1])
-            adjacents_v = self.board.adjacent_vertical_numbers(pos[0], pos[1])
+        def pairs(): # rule 3
+            res = []
             
-            for adj_pos_h in adjacents_h:
+            for pos in avail_pos:
                 row = pos[0]
-                col = pos[1] 
-                if 
-                    print(self.board.adjacent_horizontal_numbers(pos[0], pos[1] + 2))
-                    #print(self.board.adjacent_horizontal_numbers(pos[0], pos[1] - 2))
-                    
-            # for adj_pos_v in adjacents_v:
-            #     for i in range(2):
-            #         self.board.adjacent_vertical_numbers(adj_pos_v[i])
-    
+                col = pos[1]
+                
+                adjacents_h = board.adjacent_horizontal_numbers(row, col)
+                adjacents_v = board.adjacent_vertical_numbers(row, col)
+                
+                if not board.out_of_bounds(row, col - 2):
+                    if board.get_number(row, col - 2) == adjacents_h[0] == 0:
+                        res += [(row, col, 1)]
+                        
+                    elif board.get_number(row, col - 2) == adjacents_h[0] == 1: 
+                        res += [(row, col, 0)]
+                
+                if not board.out_of_bounds(row, col + 2):
+                    if board.get_number(row, col + 2) == adjacents_h[1] == 0:
+                        res += [(row, col, 1)]
+                        
+                    elif board.get_number(row, col + 2) == adjacents_h[1] == 1: 
+                        res += [(row, col, 0)]
+                
+                if not board.out_of_bounds(row + 2, col): 
+                    if board.get_number(row + 2, col) == adjacents_v[0] == 0:
+                        res += [(row, col, 1)]
+                        
+                    elif board.get_number(row + 2, col) == adjacents_v[0] == 1: 
+                        res += [(row, col, 0)]
+                
+                if not board.out_of_bounds(row - 2, col):     
+                    if board.get_number(row - 2, col) == adjacents_v[1] == 0:
+                        res += [(row, col, 1)]
+                        
+                    elif board.get_number(row - 2, col) == adjacents_v[1] == 1: 
+                        res += [(row, col, 0)]
+
+            return res
+        
+        if avail_pos:
+            for rule in (fill_cols, fill_rows, trios, pairs):
+                colococao = rule()
+                if colococao:
+                    return [colococao[0]]
+
+                else:
+                    return [(avail_pos[0][0], avail_pos[0][1], 0), (avail_pos[0][0], avail_pos[0][1], 1)]
+            
+        else:
+            return []
+        
     
     def result(self, state: TakuzuState, action):
         """Retorna o estado resultante de executar a 'action' sobre
@@ -217,13 +233,17 @@ class Takuzu(Problem):
         """Retorna True se e só se o estado passado como argumento é
         um estado objetivo. Deve verificar se todas as posições do tabuleiro
         estão preenchidas com uma sequência de números adjacentes."""
-        board=state.board
+        board = Board(state.board.board, self.board.n)
         
-        def different_columns_lines(self, board : Board):
-            return len(np.unique(board.get_rows())) == len(board.get_rows()) and \
-                len(np.unique(board.get_columns())) == len(board.get_columns()) 
+        if len(board.get_avail_pos()) != 0:
+            return False
+        
+        
+        def different_columns_lines():
+            return len(np.unique(board.get_rows(),axis=0)) == len(board.get_rows()) and \
+                len(np.unique(board.get_columns(),axis=0)) == len(board.get_columns()) 
                 
-        def equal_number_1_0(self, board : Board):
+        def equal_number_1_0():
             rows = board.get_rows()
             columns = board.get_columns()
             count_var = 0
@@ -256,8 +276,7 @@ class Takuzu(Problem):
                         return False
                 return True
             
-        def different_adj_numbers(self, board : Board):
-            rows = board.get_rows()
+        def different_adj_numbers():
             
             for i in range(board.n):
                 for j in range(board.n):
@@ -266,7 +285,7 @@ class Takuzu(Problem):
             return True     
             
     
-        return different_columns_lines(board) and equal_number_1_0(board) and different_adj_numbers(board)
+        return different_columns_lines() and equal_number_1_0() and different_adj_numbers()
     
         
 
@@ -278,23 +297,27 @@ class Takuzu(Problem):
     # TODO: outros metodos da classe
 
 if __name__ == "__main__":
-    # TODO:
-    # Ler o ficheiro de input de sys.argv[1],
-    # Usar uma técnica de procura para resolver a instância,
-    # Retirar a solução a partir do nó resultante,
-    # Imprimir para o standard output no formato indicado.
-    pass
+    board = Board.parse_instance_from_stdin()
+    problem = Takuzu(board)
+    state = TakuzuState(board)
 
+    goal_node = depth_first_tree_search(problem)
+    print(goal_node.state.board, end="")
 
 # board = Board.parse_instance_from_stdin()
-# print("Initial:\n",board,sep="")
 # problem = Takuzu(board)
 # state = TakuzuState(board)
-# avail_pos = board.get_avail_pos()
-# print(avail_pos)
-# print(problem.pairs(avail_pos))
-# print(problem.different_adj_numbers(board))
-# print(problem.result(state,(1,1,1)))
-# print(problem.last_avail_pos(avail_pos))
-# print(problem.goal_test(state))
-# print(problem.equal_vertical_adjacents((0, 1)))
+# print("Initial:\n", state.board, sep="")
+
+# s1=problem.result(state, (0, 0, 0))
+# s2 = problem.result(s1, (0, 2, 1))
+# s3 = problem.result(s2, (1, 0, 1))
+# s4 = problem.result(s3, (1, 1, 0))
+# s5 = problem.result(s4, (1, 3, 1))
+# s6 = problem.result(s5, (2, 0, 0))
+# s7 = problem.result(s6, (2, 2, 1))
+# s8 = problem.result(s7, (2, 3, 1))
+# s9 = problem.result(s8, (3, 2, 0))
+
+# print("Is goal?", problem.goal_test(s9))
+# print("Solution:\n", s9.board, sep="")
