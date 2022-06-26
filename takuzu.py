@@ -7,12 +7,11 @@
 # 99108 Matilde Tocha
 
 from itertools import count
+from xmlrpc.client import boolean
 import numpy as np
 from numpy import array, broadcast_to, column_stack
 
 import sys
-
-from sqlalchemy import false, true
 
 from search import (
     Problem,
@@ -74,6 +73,9 @@ class Board:
         cp_board[pos[0], pos[1]] = pos[2]
 
         return cp_board
+    
+    def index_in_range(self, row, col) -> boolean:
+        return row >= 0 and row < self.n and col >= 0 and col < self.n
         
     def adjacent_vertical_numbers(self, row: int, col: int) -> tuple:
         """Devolve os valores imediatamente abaixo e acima,
@@ -123,6 +125,7 @@ class Board:
 
 # print(board.adjacent_vertical_numbers(1, 1))
 # print(board.adjacent_horizontal_numbers(1, 1))
+# print(board.index_in_range(5, 0))
 
 
 class Takuzu(Problem):
@@ -181,9 +184,22 @@ class Takuzu(Problem):
                     
             return res
     
-    def equal_horizontal_adjacents(self, pos): # rule 3
-        return tuple(value for value in (0,1) if value not in \
-            self.board.adjacent_horizontal_numbers(pos[0], pos[1])) + pos
+    def pairs(self, avail_pos: tuple): # rule 3
+        res = []
+        for pos in avail_pos:
+            adjacents_h = self.board.adjacent_horizontal_numbers(pos[0], pos[1])
+            adjacents_v = self.board.adjacent_vertical_numbers(pos[0], pos[1])
+            
+            for adj_pos_h in adjacents_h:
+                row = pos[0]
+                col = pos[1] 
+                if 
+                    print(self.board.adjacent_horizontal_numbers(pos[0], pos[1] + 2))
+                    #print(self.board.adjacent_horizontal_numbers(pos[0], pos[1] - 2))
+                    
+            # for adj_pos_v in adjacents_v:
+            #     for i in range(2):
+            #         self.board.adjacent_vertical_numbers(adj_pos_v[i])
     
     
     def result(self, state: TakuzuState, action):
@@ -235,10 +251,10 @@ class Takuzu(Problem):
             else:
                 for i in range(len(rows)):
                     if np.count_nonzero(rows[i] == 1) != board.n / 2 or np.count_nonzero(rows[i] == 0) != board.n / 2:
-                        return false
+                        return False
                     if np.count_nonzero(columns[i] == 1) != board.n / 2 or np.count_nonzero(columns[i] == 0) != board.n / 2:
-                        return false
-                return true
+                        return False
+                return True
             
         def different_adj_numbers(self, board : Board):
             rows = board.get_rows()
@@ -246,8 +262,8 @@ class Takuzu(Problem):
             for i in range(board.n):
                 for j in range(board.n):
                     if len(set(board.adjacent_horizontal_numbers(i,j)))==1 and board.get_number(i,j)==board.adjacent_horizontal_numbers(i,j)[0] or len(set(board.adjacent_vertical_numbers(i,j)))==1 and board.get_number(i,j)==board.adjacent_vertical_numbers(i,j)[0]:
-                        return false
-            return true     
+                        return False
+            return True     
             
     
         return different_columns_lines(board) and equal_number_1_0(board) and different_adj_numbers(board)
@@ -270,13 +286,13 @@ if __name__ == "__main__":
     pass
 
 
-board = Board.parse_instance_from_stdin()
-print("Initial:\n",board,sep="")
-problem = Takuzu(board)
-state = TakuzuState(board)
+# board = Board.parse_instance_from_stdin()
+# print("Initial:\n",board,sep="")
+# problem = Takuzu(board)
+# state = TakuzuState(board)
 # avail_pos = board.get_avail_pos()
 # print(avail_pos)
-# print(problem.trios(avail_pos))
+# print(problem.pairs(avail_pos))
 # print(problem.different_adj_numbers(board))
 # print(problem.result(state,(1,1,1)))
 # print(problem.last_avail_pos(avail_pos))
