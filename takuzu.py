@@ -47,19 +47,9 @@ class Board:
         return self.board[row, col]
             
     def get_columns(self) -> array:
-        # tup = ()
-        # for i in range(self.n):
-        #     tupl = ()
-        #     for j in range(self.n):
-        #         tupl += (self.board[j, i],)
-        #     tup += (tupl,)
         return np.transpose(self.board)
     
     def get_rows(self) -> array:
-        # tup = ()
-        # for i in range(self.n):
-        #    tup += (tuple(self.board[i]),)
-        # np.array([self.board[i, :] for i in range(self.n)])
         return self.board
     
     def get_avail_pos(self) -> tuple:
@@ -90,9 +80,11 @@ class Board:
         string = ''
         for i in range(self.n):
             for j in range(self.n):
-                string += str(self.board[i, j]) + '\t'
-            if i != self.n:
-                string += '\n'
+                if j == self.n - 1:
+                    string += str(self.board[i, j]) + '\n'
+                else:
+                    string += str(self.board[i, j]) +  '\t'
+            
         return string 
 
     @staticmethod
@@ -146,7 +138,7 @@ class Takuzu(Problem):
                     res += [(pos[0], pos[1], 1) for pos in avail_pos if pos[0] == i]
                 
                 elif np.count_nonzero(rows[i] == 1) == board.n // 2 + board.n % 2:
-                    res += [(pos[0], pos[1], 1) for pos in avail_pos if pos[0] == i]
+                    res += [(pos[0], pos[1], 0) for pos in avail_pos if pos[0] == i]
                     
             return res
     
@@ -211,8 +203,7 @@ class Takuzu(Problem):
                 if colococao:
                     return [colococao[0]]
 
-                else:
-                    return [(avail_pos[0][0], avail_pos[0][1], 0), (avail_pos[0][0], avail_pos[0][1], 1)]
+            return [(avail_pos[0][0], avail_pos[0][1], 0), (avail_pos[0][0], avail_pos[0][1], 1)]
             
         else:
             return []
@@ -302,22 +293,4 @@ if __name__ == "__main__":
     state = TakuzuState(board)
 
     goal_node = depth_first_tree_search(problem)
-    print(goal_node.state.board, end="")
-
-# board = Board.parse_instance_from_stdin()
-# problem = Takuzu(board)
-# state = TakuzuState(board)
-# print("Initial:\n", state.board, sep="")
-
-# s1=problem.result(state, (0, 0, 0))
-# s2 = problem.result(s1, (0, 2, 1))
-# s3 = problem.result(s2, (1, 0, 1))
-# s4 = problem.result(s3, (1, 1, 0))
-# s5 = problem.result(s4, (1, 3, 1))
-# s6 = problem.result(s5, (2, 0, 0))
-# s7 = problem.result(s6, (2, 2, 1))
-# s8 = problem.result(s7, (2, 3, 1))
-# s9 = problem.result(s8, (3, 2, 0))
-
-# print("Is goal?", problem.goal_test(s9))
-# print("Solution:\n", s9.board, sep="")
+    print(goal_node.state.board, end = "")
