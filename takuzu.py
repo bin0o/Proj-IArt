@@ -6,16 +6,19 @@
 # 99102 Manuel Albino
 # 99108 Matilde Tocha
 
+from email.header import Header
 import numpy as np
-from numpy import array, broadcast_to, column_stack
+from numpy import array
 
 import sys
 
 from search import (
+    InstrumentedProblem,
     Problem,
     Node,
     astar_search,
     breadth_first_tree_search,
+    compare_searchers,
     depth_first_tree_search,
     greedy_search,
     recursive_best_first_search,
@@ -32,15 +35,13 @@ class TakuzuState:
     def __lt__(self, other):
         return self.id < other.id
 
-    # TODO: outros metodos da classe
-
-
 class Board:
     """Representação interna de um tabuleiro de Takuzu."""
 
     def __init__(self, board: np.array, n: int) -> None:
         self.board = board
         self.n = n
+        self.certains=0
         
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
@@ -114,7 +115,7 @@ class Takuzu(Problem):
         board = Board(state.board.board, self.board.n)
         avail_pos = board.get_avail_pos()
                     
-        def fill_cols() -> np.array: # rule 1
+        def fill_cols() -> np.array: # rule 1.1
             columns = board.get_columns()
             res = []
             np.array(res)
@@ -128,7 +129,7 @@ class Takuzu(Problem):
                     
             return res
         
-        def fill_rows() -> np.array: # rule 1
+        def fill_rows() -> np.array: # rule 1.2
             rows = board.get_rows()
             res = []
             np.array(res)
@@ -199,9 +200,10 @@ class Takuzu(Problem):
         
         if avail_pos:
             for rule in (fill_cols, fill_rows, trios, pairs):
-                colococao = rule()
-                if colococao:
-                    return [colococao[0]]
+                certain = rule()
+                if certain:
+                    board.certains+=1
+                    return [certain[0]]
 
             return [(avail_pos[0][0], avail_pos[0][1], 0), (avail_pos[0][0], avail_pos[0][1], 1)]
             
@@ -263,6 +265,7 @@ class Takuzu(Problem):
                 for i in range(len(rows)):
                     if np.count_nonzero(rows[i] == 1) != board.n / 2 or np.count_nonzero(rows[i] == 0) != board.n / 2:
                         return False
+
                     if np.count_nonzero(columns[i] == 1) != board.n / 2 or np.count_nonzero(columns[i] == 0) != board.n / 2:
                         return False
                 return True
@@ -271,8 +274,9 @@ class Takuzu(Problem):
             
             for i in range(board.n):
                 for j in range(board.n):
-                    if len(set(board.adjacent_horizontal_numbers(i,j)))==1 and board.get_number(i,j)==board.adjacent_horizontal_numbers(i,j)[0] or len(set(board.adjacent_vertical_numbers(i,j)))==1 and board.get_number(i,j)==board.adjacent_vertical_numbers(i,j)[0]:
+                    if len(set(board.adjacent_horizontal_numbers(i,j))) == 1 and board.get_number(i,j) == board.adjacent_horizontal_numbers(i,j)[0] or len(set(board.adjacent_vertical_numbers(i,j))) == 1 and board.get_number(i,j) == board.adjacent_vertical_numbers(i,j)[0]:
                         return False
+
             return True     
             
     
@@ -282,15 +286,18 @@ class Takuzu(Problem):
 
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
-        # TODO
-        pass
+        return 99999999999-node.state.board.certains
 
-    # TODO: outros metodos da classe
 
 if __name__ == "__main__":
     board = Board.parse_instance_from_stdin()
     problem = Takuzu(board)
-    state = TakuzuState(board)
+ 
+    compare_searchers([problem,],header=['Searchers','Results'],searchers=[breadth_first_tree_search,
+                                                  depth_first_tree_search,
+                                                  greedy_search,
+                                                  astar_search])
 
-    goal_node = depth_first_tree_search(problem)
-    print(goal_node.state.board, end = "")
+    # goal_node = depth_first_tree_search(problem)
+    # print(goal_node.state.board, end = "")
+    
