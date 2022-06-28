@@ -6,14 +6,12 @@
 # 99102 Manuel Albino
 # 99108 Matilde Tocha
 
-from email.header import Header
 import numpy as np
 from numpy import array
 
 import sys
 
 from search import (
-    InstrumentedProblem,
     Problem,
     Node,
     astar_search,
@@ -41,7 +39,7 @@ class Board:
     def __init__(self, board: np.array, n: int) -> None:
         self.board = board
         self.n = n
-        self.certains=0
+        self.certains = 0
         
     def get_number(self, row: int, col: int) -> int:
         """Devolve o valor na respetiva posição do tabuleiro."""
@@ -202,7 +200,7 @@ class Takuzu(Problem):
             for rule in (fill_cols, fill_rows, trios, pairs):
                 certain = rule()
                 if certain:
-                    board.certains+=1
+                    board.certains += 1
                     return [certain[0]]
 
             return [(avail_pos[0][0], avail_pos[0][1], 0), (avail_pos[0][0], avail_pos[0][1], 1)]
@@ -286,18 +284,114 @@ class Takuzu(Problem):
 
     def h(self, node: Node):
         """Função heuristica utilizada para a procura A*."""
-        return 99999999999-node.state.board.certains
+        # board = Board(node.state.board.board, self.board.n)
+        # avail_pos = board.get_avail_pos()
+                    
+        # def fill_cols() -> np.array: # rule 1.1
+        #     columns = board.get_columns()
+        #     res = []
+        #     np.array(res)
+            
+        #     for i in range(len(columns)):
+        #         if np.count_nonzero(columns[i] == 0) == board.n // 2 + board.n % 2:
+        #             res += [(pos[0], pos[1], 1) for pos in avail_pos if pos[1] == i]
+                
+        #         elif np.count_nonzero(columns[i] == 1) == board.n // 2 + board.n % 2:
+        #             res += [(pos[0], pos[1], 0) for pos in avail_pos if pos[1] == i]
+                    
+        #     return res
+        
+        # def fill_rows() -> np.array: # rule 1.2
+        #     rows = board.get_rows()
+        #     res = []
+        #     np.array(res)
+            
+        #     for i in range(len(rows)):
+        #         if np.count_nonzero(rows[i] == 0) == board.n // 2 + board.n % 2:
+        #             res += [(pos[0], pos[1], 1) for pos in avail_pos if pos[0] == i]
+                
+        #         elif np.count_nonzero(rows[i] == 1) == board.n // 2 + board.n % 2:
+        #             res += [(pos[0], pos[1], 0) for pos in avail_pos if pos[0] == i]
+                    
+        #     return res
+    
+        # def trios(): # rule 2
+        #     res = []
+        #     np.array(res)
+        #     for pos in avail_pos:
+        #         adjacents_v = board.adjacent_vertical_numbers(pos[0], pos[1])
+        #         adjacents_h = board.adjacent_horizontal_numbers(pos[0], pos[1])
+
+        #         if len(set(adjacents_v)) == 1 and (adjacents_v[0] == 0 or adjacents_v[0] == 1):
+        #             res += [(pos[0], pos[1], 1) if adjacents_v[0] == adjacents_v[1] == 0 else (pos[0], pos[1], 0)]
+
+        #         if len(set(adjacents_h)) == 1 and (adjacents_h[0] == 0 or adjacents_h[0] == 1):
+        #             res += [(pos[0], pos[1], 1) if adjacents_h[0] == adjacents_h[1] == 0 else (pos[0], pos[1], 0)]
+                    
+        #     return res
+    
+        # def pairs(): # rule 3
+        #     res = []
+            
+        #     for pos in avail_pos:
+        #         row = pos[0]
+        #         col = pos[1]
+                
+        #         adjacents_h = board.adjacent_horizontal_numbers(row, col)
+        #         adjacents_v = board.adjacent_vertical_numbers(row, col)
+                
+        #         if not board.out_of_bounds(row, col - 2):
+        #             if board.get_number(row, col - 2) == adjacents_h[0] == 0:
+        #                 res += [(row, col, 1)]
+                        
+        #             elif board.get_number(row, col - 2) == adjacents_h[0] == 1: 
+        #                 res += [(row, col, 0)]
+                
+        #         if not board.out_of_bounds(row, col + 2):
+        #             if board.get_number(row, col + 2) == adjacents_h[1] == 0:
+        #                 res += [(row, col, 1)]
+                        
+        #             elif board.get_number(row, col + 2) == adjacents_h[1] == 1: 
+        #                 res += [(row, col, 0)]
+                
+        #         if not board.out_of_bounds(row + 2, col): 
+        #             if board.get_number(row + 2, col) == adjacents_v[0] == 0:
+        #                 res += [(row, col, 1)]
+                        
+        #             elif board.get_number(row + 2, col) == adjacents_v[0] == 1: 
+        #                 res += [(row, col, 0)]
+                
+        #         if not board.out_of_bounds(row - 2, col):     
+        #             if board.get_number(row - 2, col) == adjacents_v[1] == 0:
+        #                 res += [(row, col, 1)]
+                        
+        #             elif board.get_number(row - 2, col) == adjacents_v[1] == 1: 
+        #                 res += [(row, col, 0)]
+
+        #     return res
+        
+        # if avail_pos:
+        #     for rule in (fill_cols, fill_rows, trios, pairs):
+        #         certain = rule()
+        #         if certain:
+        #             board.certains += 1
+
+        #     return 9223372036854775807 - board.certains
+            
+        # else:
+        #     return 0
+        # return len(node.state.board.get_avail_pos())
+        pass
+    
 
 
 if __name__ == "__main__":
     board = Board.parse_instance_from_stdin()
     problem = Takuzu(board)
- 
-    compare_searchers([problem,],header=['Searchers','Results'],searchers=[breadth_first_tree_search,
-                                                  depth_first_tree_search,
-                                                  greedy_search,
-                                                  astar_search])
+    goal_node = astar_search(problem)
+    print(goal_node.state.board, end = "")
+    
+    # compare_searchers([problem], header=['Searchers','Results'], searchers=[astar_search])
 
-    # goal_node = depth_first_tree_search(problem)
-    # print(goal_node.state.board, end = "")
+    
     
